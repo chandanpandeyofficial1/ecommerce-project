@@ -34,6 +34,19 @@ A small e-commerce system for groceries (rice, dal, pulses, etc.).
 - Status flow: `pending -> confirmed -> shipped -> delivered`, or `cancelled`.
 - Cancelling an order puts the stock back.
 
+## Additional scope
+
+- Order placement runs in a DB transaction with row locking, so concurrent orders cannot oversell stock
+- Form request validation and a consistent JSON response and error format
+- Paginated product and order listings
+- Delivery address captured at checkout, with an order status history
+- Admin dashboard with total orders, pending orders and low-stock products
+- Soft delete for products, so past orders keep their product details
+- Prices stored on order items, so later price changes do not affect old orders
+- Image validation (type and size) and storage with public URLs
+- Feature tests for auth, stock handling and order status changes
+- Postman collection and seeders (admin user, categories, sample products)
+
 ## Tech
 
 - Laravel, MySQL, Sanctum (token auth), role middleware
