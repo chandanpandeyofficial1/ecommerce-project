@@ -1,0 +1,932 @@
+{
+  "info": {
+    "name": "Ecommerce API",
+    "description": "REST API for the ecommerce backend. Run Login first to store the token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost/code/ecommerce-project/backend/public/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "cart_item_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.expect(pm.response.code).to.be.oneOf([201]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.token) { pm.collectionVariables.set('token', j.data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "register"
+              ]
+            },
+            "description": "Create a customer account and return a token. Rules: name required, 2-255 chars; email required, valid, unique; password required, min 8 chars, must match password_confirmation; phone optional, 7-15 characters of digits, +, - or spaces. Role is always customer. Returns 201.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"new.user+1@example.com\",\n  \"password\": \"secret1234\",\n  \"password_confirmation\": \"secret1234\",\n  \"phone\": \"9876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.token) { pm.collectionVariables.set('token', j.data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "login"
+              ]
+            },
+            "description": "Log in and return a token. Rules: email required, valid; password required. Returns 401 for wrong credentials. Seeded customer shown.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"customer@example.com\",\n  \"password\": \"customer123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            },
+            "description": "Revoke the token used for this request. Requires login."
+          }
+        },
+        {
+          "name": "Me",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "me"
+              ]
+            },
+            "description": "Return the logged in user in data. Requires login."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Catalogue",
+      "item": [
+        {
+          "name": "Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            },
+            "description": "List all categories sorted by name. Response: data[] with id and name."
+          }
+        },
+        {
+          "name": "Products list",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.length) { pm.collectionVariables.set('product_id', String(j.data[0].id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products?search=&category_id=&page=1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category_id",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Paginated products (10 per page). Query rules: search optional string max 100 chars (name contains); category_id optional integer; page integer min 1. Saves the first product id to product_id."
+          }
+        },
+        {
+          "name": "Product by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/products/{{product_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            },
+            "description": "One product by id in data (id, category_id, category, name, description, price, stock, unit, image_url). Returns 404 if missing."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "item": [
+        {
+          "name": "Upload avatar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/profile/avatar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "profile",
+                "avatar"
+              ]
+            },
+            "description": "Upload a profile photo as multipart form data. Field avatar: jpg, jpeg, png or webp, max 2 MB. Replaces any previous photo. Response: data (user with avatar_url). Customer role only.",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "avatar",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Remove avatar",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/profile/avatar",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "profile",
+                "avatar"
+              ]
+            },
+            "description": "Remove the profile photo. Response: data (user with avatar_url null). Customer role only."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "View cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "Cart lines and total. Response: data.items[] (id, quantity, line_total, product) and data.total. Customer role only."
+          }
+        },
+        {
+          "name": "Add to cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.expect(pm.response.code).to.be.oneOf([201]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.id) { pm.collectionVariables.set('cart_item_id', String(j.data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart"
+              ]
+            },
+            "description": "Add a product, or increase quantity if already in the cart. Rules: product_id required, integer, existing product; quantity required, integer 1-100, and total quantity may not exceed stock (422). Returns 201 and saves the cart item id to cart_item_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update cart quantity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart/{{cart_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart",
+                "{{cart_item_id}}"
+              ]
+            },
+            "description": "Set the quantity of one of your cart items. Rules: quantity required, integer 1-100, not above stock. Other users' items return 404.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Remove cart item",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/cart/{{cart_item_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "cart",
+                "{{cart_item_id}}"
+              ]
+            },
+            "description": "Remove one of your cart items. Returns message Removed."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Place order from cart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.expect(pm.response.code).to.be.oneOf([201]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.id) { pm.collectionVariables.set('order_id', String(j.data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Order everything in the cart (cart is emptied). Rules: address required, 5-500 chars; phone required, 7-15 characters of digits, +, - or spaces; use_cart true; payment_method optional cod or card (default cod); product_id and quantity must not be sent with use_cart true. Empty cart or low stock returns 422. Card orders also return checkout_url. Saves order id to order_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"use_cart\": true,\n  \"payment_method\": \"cod\",\n  \"address\": \"12 MG Road, Bengaluru 560001\",\n  \"phone\": \"9876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Buy now (COD)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.expect(pm.response.code).to.be.oneOf([201]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.id) { pm.collectionVariables.set('order_id', String(j.data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Direct buy without the cart, cash on delivery. Rules: use_cart false; product_id required, existing product; quantity required, integer 1-100, within stock; address required, 5-500 chars; phone required, 7-15 characters of digits, +, - or spaces; payment_method cod. Saves order id to order_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"use_cart\": false,\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 1,\n  \"payment_method\": \"cod\",\n  \"address\": \"12 MG Road, Bengaluru 560001\",\n  \"phone\": \"9876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Buy now (card)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 201', function () { pm.expect(pm.response.code).to.be.oneOf([201]); });",
+                  "var j = pm.response.json();",
+                  "if (j.data && j.data.id) { pm.collectionVariables.set('order_id', String(j.data.id)); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Direct buy paid by card. Same rules as Buy now (COD) with payment_method card. Response includes checkout_url for the payment link; returns 502 if the gateway fails (order is cancelled). Saves order id to order_id.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"use_cart\": false,\n  \"product_id\": \"{{product_id}}\",\n  \"quantity\": 1,\n  \"payment_method\": \"card\",\n  \"address\": \"12 MG Road, Bengaluru 560001\",\n  \"phone\": \"9876543210\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "List orders",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            },
+            "description": "Your orders, newest first, 10 per page, with items."
+          }
+        },
+        {
+          "name": "Show order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}"
+              ]
+            },
+            "description": "One of your orders with items and status_history. Pending unpaid card orders are checked with the gateway first. Returns 404 for others' orders."
+          }
+        },
+        {
+          "name": "Cancel order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}/cancel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "cancel"
+              ]
+            },
+            "description": "Cancel your own order. Only pending orders can be cancelled (422 otherwise). No body."
+          }
+        },
+        {
+          "name": "Pay order",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200', function () { pm.expect(pm.response.code).to.be.oneOf([200]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/orders/{{order_id}}/pay",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "pay"
+              ]
+            },
+            "description": "Get a fresh payment link for your own pending, unpaid card order. Returns 422 if it is not a card order, already paid, or no longer pending. Response includes checkout_url. No body."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook",
+      "item": [
+        {
+          "name": "Razorpay webhook",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status code is 200, 400', function () { pm.expect(pm.response.code).to.be.oneOf([200, 400]); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Razorpay-Signature",
+                "value": "<hmac_sha256_of_raw_body>"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/razorpay/webhook",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "razorpay",
+                "webhook"
+              ]
+            },
+            "description": "For reference only. Called by Razorpay; the X-Razorpay-Signature header must be the HMAC SHA256 of the exact raw body using the webhook secret, so this request returns 400 unless the signature is computed. Events: payment_link.paid marks the order paid; payment_link.expired and payment_link.cancelled mark payment failed. payload.payment_link.entity.id must match the order payment reference.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment_link.paid\",\n  \"payload\": {\n    \"payment_link\": {\n      \"entity\": {\n        \"id\": \"plink_example123\",\n        \"status\": \"paid\"\n      }\n    }\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

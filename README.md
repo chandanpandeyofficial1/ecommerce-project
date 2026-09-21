@@ -57,9 +57,9 @@ A small e-commerce system for groceries (rice, dal, pulses, etc.).
 
 - `users` (name, email, password, role)
 - `categories` (name)
-- `products` (category_id, name, description, price, stock, image)
-- `carts` / `cart_items`
-- `orders` (user_id, total, status, address, payment_method)
+- `products` (category_id, name, description, price, stock, unit, image)
+- `cart_items` (user_id, product_id, quantity)
+- `orders` (user_id, total, status, address, phone, payment_method)
 - `order_items` (order_id, product_id, price, quantity)
 
 ## API (planned)
